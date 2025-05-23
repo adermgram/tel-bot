@@ -8,7 +8,7 @@ import sys
 
 TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL") 
-
+PORT = int(os.getenv("PORT", "8080"))
 flags = [
     {"emoji": "🇯🇵", "country": "japan"},
     {"emoji": "🇫🇷", "country": "france"},

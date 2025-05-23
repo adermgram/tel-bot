@@ -1,14 +1,9 @@
-import os
-import asyncio
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import random
-import logging
-import sys
 
-TOKEN = os.getenv("BOT_TOKEN")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL") 
-PORT = int(os.getenv("PORT", "8080"))
+TOKEN = "telegram API token" 
+
 flags = [
     {"emoji": "🇯🇵", "country": "japan"},
     {"emoji": "🇫🇷", "country": "france"},
@@ -125,29 +120,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👉 Type /play to begin or /help for instructions."
     )
 
-logging.basicConfig(
-    stream=sys.stdout,
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+app = Application.builder().token(TOKEN).build()
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("play", play))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_guess))
 
-# Setup
-
-if __name__ == "__main__":
-    app = Application.builder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("play", play))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_guess))
-
-    # Set webhook synchronously before running the server
-    app.bot.set_webhook(f"{WEBHOOK_URL}/webhook")
-
-    # Run webhook server (this is a blocking call; do NOT wrap in asyncio.run())
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=f"{WEBHOOK_URL}/webhook"
-    )
-
+app.run_polling()

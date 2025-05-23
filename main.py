@@ -123,20 +123,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "👉 Type /play to begin or /help for instructions."
     )
 
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
 # Setup
+
 if __name__ == "__main__":
-    import logging
-    import sys
-
-    logging.basicConfig(
-        stream=sys.stdout,
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-
-    import os
-    from telegram.ext import Application
-
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -144,14 +139,13 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_guess))
 
-    async def run():
-        await app.bot.set_webhook(f"{WEBHOOK_URL}/webhook")
-        await app.run_webhook(
-            listen="0.0.0.0",
-            port=int(os.getenv("PORT", "8080")),
-            webhook_url=f"{WEBHOOK_URL}/webhook"
-        )
+    # Set webhook synchronously before running the server
+    app.bot.set_webhook(f"{WEBHOOK_URL}/webhook")
 
-    import asyncio
-    asyncio.run(run())
+    # Run webhook server (this is a blocking call; do NOT wrap in asyncio.run())
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=f"{WEBHOOK_URL}/webhook"
+    )
 

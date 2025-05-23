@@ -138,6 +138,12 @@ async def main():
         webhook_url=f"{WEBHOOK_URL}/webhook"
     )
 
+
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    try:
+        loop = asyncio.get_event_loop()
+        loop.create_task(main())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+

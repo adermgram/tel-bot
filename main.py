@@ -124,7 +124,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # Setup
-async def main():
+
+if __name__ == "__main__":
+    import logging
+    import sys
+
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    # Run the app in an existing event loop
+    import os
+    from telegram.ext import Application
+
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -132,16 +146,15 @@ async def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_guess))
 
-    await app.bot.set_webhook(f"{WEBHOOK_URL}/webhook")
-    await app.run_webhook(
-        listen="0.0.0.0",
-        port=int(os.getenv("PORT", "8080")),
-        webhook_url=f"{WEBHOOK_URL}/webhook"
-    )
+    async def run():
+        await app.bot.set_webhook(f"{WEBHOOK_URL}/webhook")
+        await app.run_webhook(
+            listen="0.0.0.0",
+            port=int(os.getenv("PORT", "8080")),
+            webhook_url=f"{WEBHOOK_URL}/webhook"
+        )
 
-
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    # Use loop.run_until_complete instead of asyncio.run to avoid nested event loop error
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())
 

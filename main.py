@@ -124,7 +124,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # Setup
-
 if __name__ == "__main__":
     import logging
     import sys
@@ -135,7 +134,6 @@ if __name__ == "__main__":
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
-    # Run the app in an existing event loop
     import os
     from telegram.ext import Application
 
@@ -154,7 +152,6 @@ if __name__ == "__main__":
             webhook_url=f"{WEBHOOK_URL}/webhook"
         )
 
-    # Use loop.run_until_complete instead of asyncio.run to avoid nested event loop error
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
+    import asyncio
+    asyncio.run(run())
 
